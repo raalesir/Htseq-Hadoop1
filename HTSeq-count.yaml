@@ -1,0 +1,56 @@
+name: HTSeq-count
+description: HTSeq-count from HTSeq Python package 
+category: Bioinfo-tools
+version: 1.0.0
+website: http://www-huber.embl.de/users/anders/HTSeq/doc/overview.html
+author: Simon Anders, Alexey Siretskiy (Hadoop version)
+
+
+
+mapred:
+
+
+  steps:
+
+    - name: Counting genes...
+
+      mapper: /home/alexey/HTseqCount/HTSeqCount_mapper.py -gff ./GFF --type=gene --idattr=ID 
+      reducer: /home/alexey/HTseqCount/HTSeqCount_reducer.py 
+      params:
+              -Dmapred.reduce.tasks=1
+              -Dmapred.reduce.slowstart.completed.maps=1.0
+              -archives $inputGFF#GFF 
+              -input $inputSAM
+              -output $output
+              -file /home/alexey/HTseqCount/HTSeqCount_mapper.py
+              -file /home/alexey/HTseqCount/HTSeqCount_reducer.py
+  inputs:
+    - id: inputSAM
+      description: SAM file with alignments
+      type: hdfs-file
+
+    - id: inputGFF
+      description: GFF file for the species 
+      type: hdfs-file
+
+  outputs:
+    - id: output
+      description: Gene counts
+      type: hdfs-folder
+      download: true
+      zip: false
+      mergeOutput: true
+
+#  outputs:
+##    - id: output
+#      description: Output Folder
+#      type: hdfs-folder
+#      mergeOutput: false
+#      download: true
+#      zip: false
+
+#    - id: temp 
+#      description: Temp
+#      type: hdfs-folder
+#      download: false
+#      temp: true
